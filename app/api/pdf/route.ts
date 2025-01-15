@@ -14,14 +14,6 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const file = formData.get("file") as File;
 
-  //   const loader = new TextLoader(file);
-
-  //   const content = await loader.load();
-
-  //   //   console.log(content[0].pageContent);
-
-  //   const chunks = await chunkText(content[0].pageContent);
-
   const content = await pdfParser(file);
   //   console.log(chunks.chunks);
 
@@ -32,7 +24,10 @@ export async function POST(req: NextRequest) {
       message: "Something went wrong",
     });
 
-  const chunks = chunkMD(content, 1000);
+  console.log(content);
+
+  const chunks = await chunkMD(content, 1000);
+  //   console.log(chunks);
 
   return NextResponse.json({
     message: "txt parsed",

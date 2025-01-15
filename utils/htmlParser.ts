@@ -46,16 +46,17 @@ export async function chunkMD(text: string, maxChunkSize = 2000) {
     // Split the Markdown into lines
     const lines = markdown.split("\n");
 
-    console.log(lines);
+    // console.log(lines);
 
     // Chunk the lines into groups
-    const chunks = [];
+    const chunks: string[] = [];
     let currentChunk = "";
 
     lines.forEach((line) => {
       // Check if adding this line exceeds the max chunk size
       if (currentChunk.length + line.length + 1 > maxChunkSize) {
         chunks.push(currentChunk.trim()); // Save the current chunk
+
         currentChunk = ""; // Reset the chunk
       }
 
@@ -70,8 +71,6 @@ export async function chunkMD(text: string, maxChunkSize = 2000) {
     // Save chunks to separate files
 
     return chunks;
-
-    console.log(`Total chunks created: ${chunks.length}`);
   } catch (error) {
     console.error(`Error chunking the Markdown file: ${error?.message ?? ""}`);
   }

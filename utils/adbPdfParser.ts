@@ -24,7 +24,7 @@ export async function pdfParser(file: File) {
     // console.log((await loader.load())[0].metadata);
     // return (await loader.load())[0].pageContent;
     const markdown = await pdf2md(buffer);
-    console.log(markdown);
+    // console.log(markdown);
 
     return markdown;
   } catch (error) {
