@@ -8,14 +8,14 @@ export async function HTMLParser(link: string) {
   //     selector: "h1,h2,h3,h4, p, img",
   //   });
 
-  turndownService.addRule("imageAltText", {
-    filter: "img",
-    replacement: (content, node) => {
-      const src = node?.getAttribute("src") || "";
-      const alt = node?.getAttribute("alt") || "image";
-      return `![${alt}](${src})`;
-    },
-  });
+  // turndownService.addRule("imageAltText", {
+  //   filter: "img",
+  //   replacement: (content, node) => {
+  //     const src = node?.getAttribute("src") || "";
+  //     const alt = node?.getAttribute("alt") || "image";
+  //     return `![${alt}](${src})`;
+  //   },
+  // });
 
   //   const data = await loaded.sca();
   const { data: html } = await axios.get(link, {

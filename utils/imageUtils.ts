@@ -27,7 +27,7 @@ export async function analyzeImage(file: File, textRatioThreshold = 0.0003) {
     cacheMethod: "none",
   });
 
-  // console.log(text);
+  console.log(text);
 
   //   Calculate text density
   const textLength = text.trim().length;
@@ -35,6 +35,7 @@ export async function analyzeImage(file: File, textRatioThreshold = 0.0003) {
   // console.log(textDensity);
 
   if (textDensity > textRatioThreshold) {
+    // TODO: Make it todo single llm call
     const response2 = await generateObject({
       model: google("gemini-1.5-flash-latest"),
       schema: z.string(),
