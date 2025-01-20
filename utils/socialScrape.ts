@@ -1,8 +1,10 @@
 import axios from "axios";
 import { CheerioWebBaseLoader } from "@langchain/community/document_loaders/web/cheerio";
 
+import * as Pinterest from "@zanixongroup/pinterest-scraper";
 import * as cheerio from "cheerio";
 import puppeteer from "puppeteer";
+import { title } from "process";
 
 // image container : _aagv
 // caption container : xt0psk2
@@ -11,9 +13,6 @@ import puppeteer from "puppeteer";
 export async function instaScrape(link: string) {
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
-  // await page.waitForSelector(
-  //   "img[class='x5yr21d xu96u03 x10l6tqk x13vifvy x87ps6o xh8yej3']"
-  // );
 
   try {
     // Navigate to the link
@@ -59,15 +58,170 @@ export async function instaScrape(link: string) {
     // Ensure the browser is closed
     await browser.close();
   }
-  // // console.log(data);
-  // const imageUrl = await page.$eval(
-  //   "img[class='x5yr21d xu96u03 x10l6tqk x13vifvy x87ps6o xh8yej3']",
-  //   (element) => {
-  //     return element.src;
-  //   }
-  // );
-
-  // const;
 }
 
 // class="_aa6a _aatb _aatd _aatf"
+
+export async function scrapeDribble(link: string) {
+  const browser = await puppeteer.launch({ headless: true });
+  const page = await browser.newPage();
+
+  try {
+    // Navigate to the link
+    await page.goto(link, { waitUntil: "networkidle2" });
+
+    // Wait for the page to load the main container
+    await page.waitForSelector("div[class='shot-page-container']");
+
+    // Extract required information
+    const postDetails = await page.evaluate(() => {
+      // Image
+      const imageElement = document.querySelector(
+        "img[class='v-img content-block border-radius-8']"
+      );
+      const imageUrl = imageElement?.getAttribute("src");
+
+      // Username
+      const usernameElement = document.querySelector(
+        "div[class='sticky-header__name']"
+      );
+      const username = usernameElement?.textContent?.trim().replace(/\n/g, " ");
+
+      const profileLinkElement = document.querySelector("a[class='user-name']");
+      const profileLink = `https://dribbble.com/${profileLinkElement?.getAttribute(
+        "href"
+      )}`;
+
+      return {
+        imageUrl,
+        profileLink,
+        // caption,
+        username,
+      };
+    });
+
+    console.log(postDetails);
+    return postDetails;
+  } catch (error) {
+    console.error("Error scraping Instagram post:", error.message);
+    return null;
+  } finally {
+    // Ensure the browser is closed
+    await browser.close();
+  }
+}
+
+export async function scrapeBehance(link: string) {
+  const browser = await puppeteer.launch({ headless: true });
+  const page = await browser.newPage();
+
+  try {
+    // Navigate to the link
+    await page.goto(link, { waitUntil: "networkidle2" });
+
+    // Wait for the page to load the main container
+    await page.waitForSelector("div[class='Project-main-oWL']");
+
+    // Extract required information
+    const postDetails = await page.evaluate(() => {
+      // Image
+      const imageElement = document.querySelector(
+        "img[class='ImageElement-image-SRv']"
+      );
+      const imageUrl = imageElement?.getAttribute("src");
+
+      const titleElement = document.querySelector(
+        "h1[class='Project-title-Q6Q']"
+      );
+
+      const title = titleElement?.textContent;
+
+      // Caption
+      // const captionElement = document.querySelectorAll(
+      //   "[data-v-7bc368fc][data-v-0ffb479a]"
+      // )[0];
+      // const caption = captionElement?.textContent?.trim();
+
+      // Username
+      // const usernameElement = document.querySelector(
+      //   "div[class='sticky-header__name']"
+      // );
+      // const username = usernameElement?.textContent?.trim().replace(/\n/g, " ");
+
+      // TODO: setup for video
+
+      const profileLinkElement = document.querySelector(
+        "a[class='Project-ownerName-A8O']"
+      );
+      const profileLink = profileLinkElement?.getAttribute("href");
+      const profileName = profileLinkElement?.textContent;
+
+      return {
+        imageUrl,
+        profileLink,
+        title,
+        profileName,
+
+        // caption,
+        // username,
+      };
+    });
+
+    // console.log(postDetails);
+    return postDetails;
+  } catch (error) {
+    console.error("Error scraping Behance post:", error.message);
+    return null;
+  } finally {
+    // Ensure the browser is closed
+    await browser.close();
+  }
+}
+
+export async function scrapePinterest(link: string) {
+  const browser = await puppeteer.launch({ headless: true });
+  const page = await browser.newPage();
+
+  try {
+    // Navigate to the link
+    await page.goto(link, { waitUntil: "networkidle2" });
+    // Wait for the page to load the main container
+    await page.waitForSelector("div[class='hs0 mQ8 ujU un8 C9i TB_']");
+    // Extract required information
+    const postDetails = await page.evaluate(() => {
+      // Image
+      const imageElement = document.querySelector(
+        "img[class='hCL kVc L4E MIw N7A XiG']"
+      );
+      // class="hCL kVc L4E MIw N7A XiG"
+      const imageUrl = imageElement?.getAttribute("src");
+      const titleElement = document.querySelector(
+        'h1[class="lH1 dyH iFc H2s GTB X8m zDA IZT CKL"]'
+      );
+      const title = titleElement?.textContent;
+      const profileLinkElement = document.querySelector(
+        'a[class="nrl _74 eEj kVc S9z NtY CCY"]'
+      );
+      const profileLink = profileLinkElement?.getAttribute("href");
+      // Username
+      const usernameElement = document.querySelector(
+        "h1[class='X8m zDA IZT tBJ dyH iFc j1A swG']"
+      );
+      const username = usernameElement?.textContent;
+      return {
+        imageUrl,
+        title,
+        profileLink,
+        username,
+      };
+    });
+    console.log(postDetails);
+    return postDetails;
+  } catch (error) {
+    console.error("Error scraping Pinterest post:", error.message);
+    return null;
+  } finally {
+    // Ensure the browser is closed
+    await browser.close();
+  }
+}

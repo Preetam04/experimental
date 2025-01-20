@@ -1,4 +1,9 @@
-import { instaScrape } from "@/utils/socialScrape";
+import {
+  instaScrape,
+  scrapeBehance,
+  scrapeDribble,
+  scrapePinterest,
+} from "@/utils/socialScrape";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
@@ -8,7 +13,9 @@ export async function POST(req: NextRequest) {
     throw new Error("Please provide a url");
   }
 
-  const data = await instaScrape(url);
+  // const data = await scrapeDribble(url);
+
+  const data = await scrapePinterest(url);
 
   //   console.log(data)
 
