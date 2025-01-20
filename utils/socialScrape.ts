@@ -117,7 +117,7 @@ export async function scrapeBehance(link: string) {
 
   try {
     // Navigate to the link
-    await page.goto(link, { waitUntil: "networkidle2" });
+    await page.goto(link, { waitUntil: "domcontentloaded" });
 
     // Wait for the page to load the main container
     await page.waitForSelector("div[class='Project-main-oWL']");
@@ -178,50 +178,108 @@ export async function scrapeBehance(link: string) {
   }
 }
 
-export async function scrapePinterest(link: string) {
+// export async function scrapePinterest(link: string) {
+//   const browser = await puppeteer.launch({ headless: true });
+//   const page = await browser.newPage();
+
+//   try {
+//     // Navigate to the link
+//     await page.goto(link, { waitUntil: "domcontentloaded" });
+//     // Wait for the page to load the main container
+//     await page.waitForSelector("div[class='hs0 mQ8 ujU un8 C9i TB_']");
+//     // Extract required information
+//     const postDetails = await page.evaluate(() => {
+//       // Image
+//       const imageElement = document.querySelector(
+//         "img[class='hCL kVc L4E MIw N7A XiG']"
+//       );
+//       // class="hCL kVc L4E MIw N7A XiG"
+//       const imageUrl = imageElement?.getAttribute("src");
+//       const titleElement = document.querySelector(
+//         'h1[class="lH1 dyH iFc H2s GTB X8m zDA IZT CKL"]'
+//       );
+//       const title = titleElement?.textContent;
+//       const profileLinkElement = document.querySelector(
+//         'a[class="nrl _74 eEj kVc S9z NtY CCY"]'
+//       );
+//       const profileLink = profileLinkElement?.getAttribute("href");
+//       // Username
+//       const usernameElement = document.querySelector(
+//         "h1[class='X8m zDA IZT tBJ dyH iFc j1A swG']"
+//       );
+//       const username = usernameElement?.textContent;
+//       return {
+//         imageUrl,
+//         title,
+//         profileLink,
+//         username,
+//       };
+//     });
+//     console.log(postDetails);
+//     return postDetails;
+//   } catch (error) {
+//     console.error("Error scraping Pinterest post:", error.message);
+//     return null;
+//   } finally {
+//     // Ensure the browser is closed
+//     await browser.close();
+//   }
+// }
+
+export async function scrapePinterest(pinUrl: string) {
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
 
   try {
-    // Navigate to the link
-    await page.goto(link, { waitUntil: "networkidle2" });
-    // Wait for the page to load the main container
-    await page.waitForSelector("div[class='hs0 mQ8 ujU un8 C9i TB_']");
-    // Extract required information
+    // Navigate to the Pinterest pin URL
+    await page.goto(pinUrl, { waitUntil: "domcontentloaded" });
+
+    // Wait for the necessary selectors to load
+    await page.waitForSelector('img[src^="https://i.pinimg.com/"]'); // Image selector
+    await page.waitForSelector('a[href^="/"]'); // Profile link selector
+    await page.waitForSelector("h1"); // Username selector
+
+    // Extract information
     const postDetails = await page.evaluate(() => {
-      // Image
       const imageElement = document.querySelector(
-        "img[class='hCL kVc L4E MIw N7A XiG']"
+        'img[src^="https://i.pinimg.com/"]'
       );
-      // class="hCL kVc L4E MIw N7A XiG"
-      const imageUrl = imageElement?.getAttribute("src");
-      const titleElement = document.querySelector(
-        'h1[class="lH1 dyH iFc H2s GTB X8m zDA IZT CKL"]'
+      const imageUrl = imageElement ? imageElement.src : null;
+
+      // console.log(profileLinkElement);
+
+      const usernameElement = document.querySelector("h1");
+      const title = usernameElement ? usernameElement.textContent : null;
+
+      const accountNameElement = document.querySelector(
+        'div[data-test-id="creator-profile-name"]'
       );
-      const title = titleElement?.textContent;
-      const profileLinkElement = document.querySelector(
-        'a[class="nrl _74 eEj kVc S9z NtY CCY"]'
-      );
-      const profileLink = profileLinkElement?.getAttribute("href");
-      // Username
-      const usernameElement = document.querySelector(
-        "h1[class='X8m zDA IZT tBJ dyH iFc j1A swG']"
-      );
-      const username = usernameElement?.textContent;
-      return {
-        imageUrl,
-        title,
-        profileLink,
-        username,
-      };
+      const accountName = accountNameElement
+        ? accountNameElement?.textContent.trim()
+        : null;
+
+      // const profileLinkElement = document.querySelector(
+      //   'a[data-test-id="creator-profile-link"]'
+      // );
+
+      // const profileLinkElement = document.querySelector(
+      //   'div[data-test-id="creator-profile-name"]'
+      // );
+      // console.log(profileLinkElement);
+
+      // const profileLink = profileLinkElement
+      //   ? `https://www.pinterest.com${profileLinkElement.getAttribute("href")}`
+      //   : null;
+
+      return { imageUrl, title, accountName };
     });
+
     console.log(postDetails);
     return postDetails;
   } catch (error) {
-    console.error("Error scraping Pinterest post:", error.message);
+    console.error("Error scraping Pinterest pin:", error.message);
     return null;
   } finally {
-    // Ensure the browser is closed
     await browser.close();
   }
 }
