@@ -283,3 +283,131 @@ export async function scrapePinterest(pinUrl: string) {
     await browser.close();
   }
 }
+
+export async function scrapeReddtit(link: string) {
+  const browser = await puppeteer.launch({ headless: true });
+  const page = await browser.newPage();
+
+  try {
+    // Navigate to the Pinterest pin URL
+    await page.setUserAgent(
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    );
+
+    // Navigate to the Reddit post
+    await page.goto(link, { waitUntil: "networkidle0" });
+    // await page.waitForSelector(
+    //   "main[class='main w-full flex-[1] min-w-0 flex-grid--main-container-card right-sidebar-xs']"
+    // ); // Username selector
+
+    // Extract information
+    const postData = await page.evaluate(() => {
+      const titleElement = document.querySelector(
+        "h1[class='font-semibold text-neutral-content-strong m-0 text-18 xs:text-24  mb-xs px-md xs:px-0 xs:mb-md  overflow-hidden']"
+      );
+      const title = titleElement?.textContent;
+      const bodyElement = document.querySelector(
+        "div[data-post-click-location='text-body']"
+      );
+      const body = bodyElement?.textContent;
+
+      const subreddit = window.location.pathname.split("/")[2] || "";
+
+      return { title, body, subreddit };
+    });
+
+    console.log(postData);
+    return postData;
+  } catch (error) {
+    console.error("Error scraping Pinterest pin:", error.message);
+    return null;
+  } finally {
+    await browser.close();
+  }
+}
+
+export async function scrapeTwitter(link: string) {
+  const browser = await puppeteer.launch({ headless: true });
+  const page = await browser.newPage();
+
+  try {
+    // Navigate to the Pinterest pin URL
+    await page.setUserAgent(
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    );
+
+    // Navigate to the Reddit post
+    await page.goto(link, { waitUntil: "networkidle0" });
+
+    // account name
+    // text
+    // image
+
+    // Extract information
+    const postData = await page.evaluate(() => {
+      const contentElement = document.querySelector(
+        "div[class='css-146c3p1 r-bcqeeo r-1ttztb7 r-qvutc0 r-37j5jr r-1inkyih r-16dba41 r-bnwqim r-135wba7']"
+      );
+      const content = contentElement?.textContent;
+
+      const imageElement = document.querySelector("img[class='css-9pa8cd']");
+
+      const image = imageElement?.getAttribute("src");
+
+      const subreddit = window.location.pathname.split("/")[1] || "";
+
+      return { content, image: image || null, subreddit };
+    });
+
+    console.log(postData);
+    return postData;
+  } catch (error) {
+    console.error("Error scraping Pinterest pin:", error.message);
+    return null;
+  } finally {
+    await browser.close();
+  }
+}
+
+export async function scrapeArena(link: string) {
+  const browser = await puppeteer.launch({ headless: true });
+  const page = await browser.newPage();
+
+  try {
+    // Navigate to the Pinterest pin URL
+    await page.setUserAgent(
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    );
+
+    // Navigate to the Reddit post
+    await page.goto(link, { waitUntil: "networkidle0" });
+
+    // account name
+    // text
+    // image
+
+    // Extract information
+    const postData = await page.evaluate(() => {
+      const contentElement = document.querySelector(
+        "div[class='css-146c3p1 r-bcqeeo r-1ttztb7 r-qvutc0 r-37j5jr r-1inkyih r-16dba41 r-bnwqim r-135wba7']"
+      );
+      const content = contentElement?.textContent;
+
+      const imageElement = document.querySelector("img[class='css-9pa8cd']");
+
+      const image = imageElement?.getAttribute("src");
+
+      const subreddit = window.location.pathname.split("/")[1] || "";
+
+      return { content, image: image || null, subreddit };
+    });
+
+    console.log(postData);
+    return postData;
+  } catch (error) {
+    console.error("Error scraping Pinterest pin:", error.message);
+    return null;
+  } finally {
+    await browser.close();
+  }
+}
