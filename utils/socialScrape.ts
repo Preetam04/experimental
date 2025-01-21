@@ -354,9 +354,9 @@ export async function scrapeTwitter(link: string) {
 
       const image = imageElement?.getAttribute("src");
 
-      const subreddit = window.location.pathname.split("/")[1] || "";
+      const username = window.location.pathname.split("/")[1] || "";
 
-      return { content, image: image || null, subreddit };
+      return { content, image: image || null, username };
     });
 
     console.log(postData);
@@ -388,18 +388,27 @@ export async function scrapeArena(link: string) {
 
     // Extract information
     const postData = await page.evaluate(() => {
-      const contentElement = document.querySelector(
-        "div[class='css-146c3p1 r-bcqeeo r-1ttztb7 r-qvutc0 r-37j5jr r-1inkyih r-16dba41 r-bnwqim r-135wba7']"
+      const imageElement = document.querySelector(
+        "img[class='c-kRgwUl c-kRgwUl-bDGmTT-mode-Loaded c-kRgwUl-inIDvk-css']"
       );
-      const content = contentElement?.textContent;
-
-      const imageElement = document.querySelector("img[class='css-9pa8cd']");
 
       const image = imageElement?.getAttribute("src");
 
-      const subreddit = window.location.pathname.split("/")[1] || "";
+      const userElement = document.querySelectorAll(
+        'dd[class="c-lgwVNZ c-lgwVNZ-iepcqn-ellipsis-true c-lgwVNZ-gyaQWK-size-xs c-lgwVNZ-ideMeaq-css"]'
+      );
 
-      return { content, image: image || null, subreddit };
+      const user = userElement[2]?.textContent;
+
+      const linkElement = userElement[2].querySelector("a");
+      const userLink = linkElement?.getAttribute("href");
+
+      return {
+        image: image || null,
+        user,
+        userLink: `https://www.are.na/${userLink}/channels`,
+        type: "arena",
+      };
     });
 
     console.log(postData);
