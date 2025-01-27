@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { TextLoader } from "langchain/document_loaders/fs/text";
-import { chunkText } from "@/utils/llm";
+import { chunkText, cleanText } from "@/utils/llm";
 
 export async function POST(req: NextRequest) {
   if (!req.headers.get("content-type")?.includes("multipart/form-data")) {
@@ -16,11 +16,15 @@ export async function POST(req: NextRequest) {
 
   const content = await loader.load();
 
+  // console.log(content);
+
+  // const text = cleanText(content[0].pageContent);
+
   //   console.log(content[0].pageContent);
 
   const chunks = await chunkText(content[0].pageContent);
 
-  console.log(chunks.chunks);
+  // console.log(chunks.chunks);
 
   //   const hContent = await loader.load();
 
@@ -29,5 +33,6 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     message: "txt parsed",
     chunks,
+    // text,
   });
 }

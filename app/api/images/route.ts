@@ -11,6 +11,8 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const image = formData.get("image") as File;
 
+  console.log(image);
+
   //   console.log(image);
   const data = await analyzeImage(image);
 

@@ -28,6 +28,9 @@ export async function instaScrape(link: string) {
         "img[class='x5yr21d xu96u03 x10l6tqk x13vifvy x87ps6o xh8yej3']"
       );
       const imageUrl = imageElement?.getAttribute("src");
+      const altText = imageElement
+        ?.getAttribute("alt")
+        ?.replace(/[^a-zA-Z0-9]/g, " ");
 
       // Caption
       const captionElement = document.querySelector(
@@ -43,9 +46,10 @@ export async function instaScrape(link: string) {
 
       return {
         imageUrl,
-        caption,
         profileUrl: `https://www.instagram.com/${username}`,
         username,
+        type: "Instagram",
+        altText,
       };
     });
 
@@ -97,6 +101,7 @@ export async function scrapeDribble(link: string) {
         profileLink,
         // caption,
         username,
+        type: "Dribble",
       };
     });
 
@@ -161,7 +166,7 @@ export async function scrapeBehance(link: string) {
         profileLink,
         title,
         profileName,
-
+        type: "Behance",
         // caption,
         // username,
       };
@@ -271,7 +276,7 @@ export async function scrapePinterest(pinUrl: string) {
       //   ? `https://www.pinterest.com${profileLinkElement.getAttribute("href")}`
       //   : null;
 
-      return { imageUrl, title, accountName };
+      return { imageUrl, title, accountName, type: "Pinterest" };
     });
 
     console.log(postDetails);
@@ -313,7 +318,7 @@ export async function scrapeReddtit(link: string) {
 
       const subreddit = window.location.pathname.split("/")[2] || "";
 
-      return { title, body, subreddit };
+      return { title, body, subreddit, type: "Reddit" };
     });
 
     console.log(postData);
@@ -350,13 +355,19 @@ export async function scrapeTwitter(link: string) {
       );
       const content = contentElement?.textContent;
 
-      const imageElement = document.querySelector("img[class='css-9pa8cd']");
+      const imageContainer = document.querySelector(
+        "a[class='css-175oi2r r-1pi2tsx r-1ny4l3l r-1loqt21']"
+      );
+
+      const imageElement = imageContainer?.querySelector(
+        "img[class='css-9pa8cd']"
+      );
 
       const image = imageElement?.getAttribute("src");
 
       const username = window.location.pathname.split("/")[1] || "";
 
-      return { content, image: image || null, username };
+      return { content, image: image || null, username, type: "Twitter" };
     });
 
     console.log(postData);
@@ -388,11 +399,14 @@ export async function scrapeArena(link: string) {
 
     // Extract information
     const postData = await page.evaluate(() => {
-      const imageElement = document.querySelector(
-        "img[class='c-kRgwUl c-kRgwUl-bDGmTT-mode-Loaded c-kRgwUl-inIDvk-css']"
+      const imageContainer = document.querySelector(
+        "div[class='PJLV PJLV-ibquiLj-css']"
       );
 
+      const imageElement = imageContainer?.querySelector("img");
+
       const image = imageElement?.getAttribute("src");
+      const altText = imageElement?.getAttribute("alt");
 
       const userElement = document.querySelectorAll(
         'dd[class="c-lgwVNZ c-lgwVNZ-iepcqn-ellipsis-true c-lgwVNZ-gyaQWK-size-xs c-lgwVNZ-ideMeaq-css"]'
@@ -406,12 +420,13 @@ export async function scrapeArena(link: string) {
       return {
         image: image || null,
         user,
+        altText,
         userLink: `https://www.are.na/${userLink}/channels`,
-        type: "arena",
+        type: "Arena",
       };
     });
 
-    console.log(postData);
+    // console.log(postData);
     return postData;
   } catch (error) {
     console.error("Error scraping Pinterest pin:", error.message);
